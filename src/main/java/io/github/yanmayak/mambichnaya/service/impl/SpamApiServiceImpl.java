@@ -3,6 +3,7 @@ package io.github.yanmayak.mambichnaya.service.impl;
 import io.github.yanmayak.mambichnaya.model.AIResponseDto;
 import io.github.yanmayak.mambichnaya.model.CheckDto;
 import io.github.yanmayak.mambichnaya.model.UserDto;
+import io.github.yanmayak.mambichnaya.repository.BannedUsersRepository;
 import io.github.yanmayak.mambichnaya.service.CombotASService;
 import io.github.yanmayak.mambichnaya.service.LolsBotService;
 import io.github.yanmayak.mambichnaya.service.PromtService;

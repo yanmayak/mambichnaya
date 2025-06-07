@@ -1,4 +1,14 @@
+spring:
+  jpa:
+    database: POSTGRESQL
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: ${PG_URL:jdbc:postgresql://localhost:5433/mambichi}
+    username: ${PG_ROOT:log}
+    password: ${PG_PASS:pass}
 deepseek:
   api:
-    url: https://api.deepseek.com
-    key: DEEPSEEK_API_KEY
+    url: ${AI_URL:https://api.deepseek.com}
+    key: ${AI_TOKEN:DEEPSEEK_API_KEY}

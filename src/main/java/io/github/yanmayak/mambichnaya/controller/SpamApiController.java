@@ -4,6 +4,7 @@ import io.github.yanmayak.mambichnaya.model.AIRequestDto;
 import io.github.yanmayak.mambichnaya.model.AIResponseDto;
 import io.github.yanmayak.mambichnaya.model.CheckDto;
 import io.github.yanmayak.mambichnaya.model.UserDto;
+import io.github.yanmayak.mambichnaya.repository.BannedUsersRepository;
 import io.github.yanmayak.mambichnaya.service.DeepSeekService;
 import io.github.yanmayak.mambichnaya.service.PromtService;
 import io.github.yanmayak.mambichnaya.service.SpamApiService;
@@ -19,6 +20,8 @@ public class SpamApiController {
     private final SpamApiService spamApiService;
     private final DeepSeekService deepSeekService;
     private final PromtService promtService;
+    private final BannedUsersRepository bannedUsersRepository;
+
 
     @PostMapping("/user/bot")
     public CheckDto checkInBots(UserDto userDto) {
@@ -32,10 +35,14 @@ public class SpamApiController {
 
     @PostMapping("/user/ai")
     public AIResponseDto checkInAI(UserDto userDto) {
-        return deepSeekService.checkUserByAi(
+        AIResponseDto responseDto = deepSeekService.checkUserByAi(
                 new AIRequestDto(userDto.getUsername(),
                         userDto.getBio(),
                         userDto.getMessage()));
-    }
+        if (!responseDto.isOk()) {
+            bannedUsersRepository.save(userDto);
+        }
 
+        return responseDto;
+    }
 }
