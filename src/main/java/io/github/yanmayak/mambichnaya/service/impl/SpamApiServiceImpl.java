@@ -8,6 +8,9 @@ import io.github.yanmayak.mambichnaya.service.SpamApiService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class SpamApiServiceImpl implements SpamApiService {
@@ -19,5 +22,14 @@ public class SpamApiServiceImpl implements SpamApiService {
         Boolean isOk = lolsBotService.LolsCheck(userDto.getId(), false) &&
                 combotASService.CombotASCheck(userDto.getId());
         return new CheckDto(userDto.getId(), isOk);
+    }
+
+    @Override
+    public List<CheckDto> checkBatch(List<UserDto> userDtos) {
+        List<CheckDto> checkDtos = new ArrayList<>();
+        for (UserDto userDto : userDtos) {
+            checkDtos.add(check(userDto));
+        }
+        return checkDtos;
     }
 }
