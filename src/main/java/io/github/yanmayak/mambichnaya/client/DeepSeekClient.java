@@ -7,6 +7,8 @@ import io.github.yanmayak.mambichnaya.model.AIResponseDto;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(
         name = "deepSeekApiClient",
@@ -14,6 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
         configuration = FeignConfig.class
 )
 public interface DeepSeekClient {
-    @PostMapping("/v1/check")
-    AIResponseDto checkUser(@RequestBody AIRequestDto request);
+    @PostMapping("/chat/completions")
+    AIResponseDto checkUser(
+            @RequestBody AIRequestDto request,
+            @RequestHeader(name = "Authorization") String token
+    );
 }

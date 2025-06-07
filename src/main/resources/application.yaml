@@ -10,5 +10,5 @@ spring:
     password: ${PG_PASS:pass}
 deepseek:
   api:
-    url: ${AI_URL:https://api.deepseek.com}
+    url: ${AI_URL:http://api.deepseek.com}
     key: ${AI_TOKEN:DEEPSEEK_API_KEY}

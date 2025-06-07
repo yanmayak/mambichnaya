@@ -8,6 +8,7 @@ import io.github.yanmayak.mambichnaya.model.UserDto;
 import io.github.yanmayak.mambichnaya.repository.BannedUsersRepository;
 import io.github.yanmayak.mambichnaya.service.DeepSeekService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,12 +16,14 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class DeepSeekServiceImpl implements DeepSeekService {
+    @Value("${deepseek.api.key}")
+    private String token;
     private final DeepSeekClient deepSeekClient;
     private final BannedUsersRepository bannedUsersRepository;
 
     @Override
     public AIResponseDto checkUserByAi(AIRequestDto aiRequestDto) {
-        AIResponseDto aiResponseDto = deepSeekClient.checkUser(aiRequestDto);
+        AIResponseDto aiResponseDto = deepSeekClient.checkUser(aiRequestDto,  token);
         aiResponseDto.setDateBanned(LocalDateTime.now());
         return aiResponseDto;
     }

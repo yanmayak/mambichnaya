@@ -1,17 +1,18 @@
 package io.github.yanmayak.mambichnaya.controller;
 
-import io.github.yanmayak.mambichnaya.model.AIRequestDto;
-import io.github.yanmayak.mambichnaya.model.AIResponseDto;
-import io.github.yanmayak.mambichnaya.model.CheckDto;
-import io.github.yanmayak.mambichnaya.model.UserDto;
+import io.github.yanmayak.mambichnaya.entity.User;
+import io.github.yanmayak.mambichnaya.model.*;
 import io.github.yanmayak.mambichnaya.repository.BannedUsersRepository;
 import io.github.yanmayak.mambichnaya.service.DeepSeekService;
 import io.github.yanmayak.mambichnaya.service.PromtService;
 import io.github.yanmayak.mambichnaya.service.SpamApiService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/checks")
@@ -36,11 +37,24 @@ public class SpamApiController {
     @PostMapping("/user/ai")
     public AIResponseDto checkInAI(UserDto userDto) {
         AIResponseDto responseDto = deepSeekService.checkUserByAi(
-                new AIRequestDto(userDto.getUsername(),
-                        userDto.getBio(),
-                        userDto.getMessage()));
+                new AIRequestDto(
+                        "deepseek-chat",
+                        List.of(
+                                new AiMessagesDto("user", userDto.toString()),
+                                new AiMessagesDto("system", promtService.promt(userDto))
+                        ),
+                        false
+                )
+        );
         if (!responseDto.isOk()) {
-            bannedUsersRepository.save(userDto);
+            bannedUsersRepository.save(
+                    new User(
+                            userDto.getId(),
+                            responseDto.getMessage(),
+                            responseDto.getReason(),
+                            responseDto.getDateBanned()
+                    )
+            );
         }
 
         return responseDto;

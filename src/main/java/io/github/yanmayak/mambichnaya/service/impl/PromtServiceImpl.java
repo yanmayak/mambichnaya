@@ -2,13 +2,14 @@ package io.github.yanmayak.mambichnaya.service.impl;
 
 import io.github.yanmayak.mambichnaya.model.AIRequestDto;
 import io.github.yanmayak.mambichnaya.model.AIResponseDto;
+import io.github.yanmayak.mambichnaya.model.PromtDto;
 import io.github.yanmayak.mambichnaya.model.UserDto;
 import io.github.yanmayak.mambichnaya.service.PromtService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PromtServiceImpl implements PromtService {
-    private StringBuffer buffer;
+    private StringBuffer buffer = new StringBuffer();
     private final String INTRO = """
             Проведи комплексную проверку пользователя Telegram и 
             его сообщения по следующим критериям:
@@ -73,7 +74,7 @@ public class PromtServiceImpl implements PromtService {
 
     @Override
     public String promt(UserDto userDto) {
-        if (!buffer.isEmpty()) {
+        if (buffer!=null || !buffer.isEmpty()) {
             buffer.delete(0, buffer.length());
         }
         buffer.append(INTRO);
@@ -91,7 +92,7 @@ public class PromtServiceImpl implements PromtService {
     }
 
     @Override
-    public AIRequestDto jsonPromt(UserDto userDto) {
-        return new AIRequestDto(userDto.getUsername(), userDto.getBio(), userDto.getMessage());
+    public PromtDto jsonPromt(UserDto userDto) {
+        return new PromtDto(userDto.getUsername(), userDto.getBio(), userDto.getMessage());
     }
 }
