@@ -11,7 +11,7 @@ import lombok.Setter;
 @Schema(description = "Карточка пользователя")
 public class UserDto {
     @Schema(description = "id пользователя")
-    private Integer id;
+    private Long id;
 
     @Schema(description = "Имя пользователя")
     private String firstName;
@@ -21,6 +21,9 @@ public class UserDto {
 
     @Schema(description = "Никнейм пользователя")
     private String username;
+
+    @Schema(description = "Биография пользователя")
+    private String bio;
 
     @Schema(description = "Фото пользователя (base64)")
     private String photo;
