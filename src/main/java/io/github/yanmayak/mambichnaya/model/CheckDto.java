@@ -11,7 +11,7 @@ import lombok.Setter;
 @Schema(description = "Карточка проверки пользователя")
 public class CheckDto {
     @Schema(description = "id пользователя")
-    private String userId;
+    private Long userId;
 
     @Schema(description = "Результат проверки пользователя")
     private Boolean isOk;
