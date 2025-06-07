@@ -5,10 +5,10 @@ spring:
     hibernate:
       ddl-auto: update
   datasource:
-    url: ${PG_URL:jdbc:postgresql://localhost:5433/mambichi}
-    username: ${PG_ROOT:log}
-    password: ${PG_PASS:pass}
+    url: ${PG_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
 deepseek:
   api:
     url: ${AI_URL:http://api.deepseek.com}
-    key: ${AI_TOKEN:DEEPSEEK_API_KEY}
+    key: ${AI_TOKEN}
