@@ -20,8 +20,8 @@ public class SpamApiServiceImpl implements SpamApiService {
 
     @Override
     public CheckDto checkInBots(UserDto userDto) {
-        Boolean isOk = lolsBotService.LolsCheck(userDto.getId(), false) &&
-                combotASService.CombotASCheck(userDto.getId());
+        Boolean isOk = !lolsBotService.LolsCheck(userDto.getId(), false) &&
+                !combotASService.CombotASCheck(userDto.getId());
         return new CheckDto(userDto.getId(), isOk);
     }
 

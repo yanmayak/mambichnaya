@@ -6,5 +6,6 @@ import io.github.yanmayak.mambichnaya.model.UserDto;
 
 public interface PromtService {
     String promt(UserDto userDto);
-    PromtDto jsonPromt(UserDto userDto);
+
+    String jsonPromt(UserDto userDto);
 }

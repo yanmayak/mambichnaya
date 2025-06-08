@@ -14,6 +14,6 @@ public class CombotASServiceImpl implements CombotASService {
     @Override
     public Boolean CombotASCheck(Long userId) {
         CombotASDto combotResponse = combotASClient.combotASCheck(userId.intValue());
-        return combotResponse.getReason().isEmpty();
+        return combotResponse.getReason() != null && !combotResponse.getReason().isEmpty();
     }
 }

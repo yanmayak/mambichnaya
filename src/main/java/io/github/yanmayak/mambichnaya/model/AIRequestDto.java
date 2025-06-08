@@ -12,5 +12,5 @@ import java.util.List;
 public class AIRequestDto {
     private String model;
     private List<AiMessagesDto> messages;
-    private boolean stream;
+    private Boolean stream;
 }

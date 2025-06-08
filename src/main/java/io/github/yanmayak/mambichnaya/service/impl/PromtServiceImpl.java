@@ -1,16 +1,17 @@
 package io.github.yanmayak.mambichnaya.service.impl;
 
-import io.github.yanmayak.mambichnaya.model.AIRequestDto;
-import io.github.yanmayak.mambichnaya.model.AIResponseDto;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.yanmayak.mambichnaya.model.PromtDto;
 import io.github.yanmayak.mambichnaya.model.UserDto;
 import io.github.yanmayak.mambichnaya.service.PromtService;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PromtServiceImpl implements PromtService {
-    private StringBuffer buffer = new StringBuffer();
-    private final String INTRO = """
+    public static final String INTRO = """
+            ОБЯЗАТЕЛЬНО СООТВЕТСТВУЙ ФОРМАТУ ВВОДА И ВЫВОДА!
+            ОТВЕТ НЕ ДОЛЖЕН СОДЕРЖАТЬ НИ КАКОГО ШАБЛОНА КРОМЕ УКАЗАННОГО В ФОРМАТЕ ОТВЕТА (НУЖНО НА ОСНОВАНИИ НИЖЕСТОЯЩИХ ПРАВИЛ НЕОБХОДИМО ОПРЕДЕЛИТЬ isOk=true или isOk=false)!
             Проведи комплексную проверку пользователя Telegram и 
             его сообщения по следующим критериям:
             """;
@@ -53,30 +54,25 @@ public class PromtServiceImpl implements PromtService {
             	•	Оцени, нет ли в сообщении призывов к нарушению закона, 
             	насилию, распространению запрещённого контента.
             """;
-    private final String FORMATTING = """
+    public static final String FORMATTING = """
             Формат ввода JSON:
             {
-              "username": "string",
-              "bio": "string",
-              "message": "string",
+              "username": "string", //юзернейм
+              "bio": "string", //о себе
+              "message": "string", //сообщение юзера
             }
             Формат вывода:
             Предоставь ответ в виде json:
             {
-              "isOk": true,
-              "message": "string",
-              "reason": "string"
+              "isOk": true
             }
             , где:
-            isOk = true, если пользователь прошел все проверки по заданным параметрам. Поля message и reason в таком случае не возвращай.\s
-            Если пользователь не прошел хотя бы одну проверку, то необходимо передать isOk = false, сообщение пользователя в message и причину в reason, из-за которой пользователь не прошел проверку.
+            isOk = true, если пользователь не спамер/бот и успешно прошел все вышеперечисленные проверки.
             """;
 
     @Override
     public String promt(UserDto userDto) {
-        if (buffer!=null || !buffer.isEmpty()) {
-            buffer.delete(0, buffer.length());
-        }
+        StringBuilder buffer = new StringBuilder();
         buffer.append(INTRO);
         if (userDto.isUsernameCheck()) {
             buffer.append(CHECK_USERNAME);
@@ -91,8 +87,9 @@ public class PromtServiceImpl implements PromtService {
         return buffer.toString();
     }
 
+    @SneakyThrows
     @Override
-    public PromtDto jsonPromt(UserDto userDto) {
-        return new PromtDto(userDto.getUsername(), userDto.getBio(), userDto.getMessage());
+    public String jsonPromt(UserDto userDto) {
+        return new ObjectMapper().writeValueAsString(new PromtDto(userDto.getUsername(), userDto.getBio(), userDto.getMessage()));
     }
 }

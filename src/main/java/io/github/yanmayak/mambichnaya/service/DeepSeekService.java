@@ -4,5 +4,5 @@ import io.github.yanmayak.mambichnaya.model.AIRequestDto;
 import io.github.yanmayak.mambichnaya.model.AIResponseDto;
 
 public interface DeepSeekService {
-    AIResponseDto checkUserByAi(AIRequestDto aiRequestDto);
+    AIResponseDto checkUserByAi(Long userId, AIRequestDto aiRequestDto);
 }

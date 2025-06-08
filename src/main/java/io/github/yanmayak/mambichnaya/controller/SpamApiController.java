@@ -1,17 +1,18 @@
 package io.github.yanmayak.mambichnaya.controller;
 
-import io.github.yanmayak.mambichnaya.entity.User;
 import io.github.yanmayak.mambichnaya.model.*;
-import io.github.yanmayak.mambichnaya.repository.BannedUsersRepository;
 import io.github.yanmayak.mambichnaya.service.DeepSeekService;
 import io.github.yanmayak.mambichnaya.service.PromtService;
 import io.github.yanmayak.mambichnaya.service.SpamApiService;
+import io.github.yanmayak.mambichnaya.service.impl.CheckBanned;
+import io.github.yanmayak.mambichnaya.service.impl.PromtServiceImpl;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -21,8 +22,7 @@ public class SpamApiController {
     private final SpamApiService spamApiService;
     private final DeepSeekService deepSeekService;
     private final PromtService promtService;
-    private final BannedUsersRepository bannedUsersRepository;
-
+    private final CheckBanned checkBanned;
 
     @PostMapping("/user/bot")
     public CheckDto checkInBots(UserDto userDto) {
@@ -34,29 +34,59 @@ public class SpamApiController {
         return promtService.promt(userDto);
     }
 
-    @PostMapping("/user/ai")
-    public AIResponseDto checkInAI(UserDto userDto) {
-        AIResponseDto responseDto = deepSeekService.checkUserByAi(
-                new AIRequestDto(
-                        "deepseek-chat",
-                        List.of(
-                                new AiMessagesDto("user", userDto.toString()),
-                                new AiMessagesDto("system", promtService.promt(userDto))
-                        ),
-                        false
-                )
-        );
-        if (!responseDto.isOk()) {
-            bannedUsersRepository.save(
-                    new User(
-                            userDto.getId(),
-                            responseDto.getMessage(),
-                            responseDto.getReason(),
-                            responseDto.getDateBanned()
+    @PostMapping("/user")
+    public AIResponseDto check(UserDto userDto) {
+        if (checkBanned.checkBanned(userDto.getId())) {
+            return this.banned(userDto);
+        }
+
+        if (userDto.isDbCheck()) {
+            CheckDto checkDto = spamApiService.checkInBots(userDto);
+            if (!checkDto.getIsOk()) {
+                return this.banned(userDto);
+            }
+        }
+
+        if (
+                userDto.getMessage() != null &&
+                        !userDto.getMessage().isEmpty() &&
+                        !userDto.getMessage().equals(" ")
+                        || !PromtServiceImpl.INTRO.concat(PromtServiceImpl.FORMATTING).equals(promtService.promt(userDto))
+        ) {
+            return deepSeekService.checkUserByAi(
+                    userDto.getId(),
+                    new AIRequestDto(
+                            "deepseek-chat",
+                            List.of(
+                                    new AiMessagesDto("system", promtService.promt(userDto)),
+                                    new AiMessagesDto("user", promtService.jsonPromt(userDto))
+                            ),
+                            false
                     )
             );
         }
 
-        return responseDto;
+        if (userDto.isPhotoCheck()) {
+            //тут чек нейронкой
+        }
+
+        return ok(userDto);
+    }
+
+    private AIResponseDto banned(UserDto userDto) {
+        return this.resp(userDto, true);
+    }
+
+    private AIResponseDto ok(UserDto userDto) {
+        return this.resp(userDto, false);
+    }
+
+    private AIResponseDto resp(UserDto userDto, boolean banned) {
+        return new AIResponseDto(
+                !banned,
+                userDto.getMessage(),
+                null,
+                LocalDateTime.now()
+        );
     }
 }

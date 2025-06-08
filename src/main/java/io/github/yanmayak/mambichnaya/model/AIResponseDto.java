@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Schema(description = "Карточка ответа ИИ-агента")
 public class AIResponseDto {
     @Schema(description = "Наличие бана у пользователя")
